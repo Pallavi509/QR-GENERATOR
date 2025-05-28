@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-title">
+        <h1>QR Generator</h1>
+        <div class="subtitle">Create QR codes instantly</div>
+    </div>
+
+    <div class="container">
+        <p> ENTER YOUR TEXT OR URL</p>
+        <input type="text" placeholder="TEXT OR URL" id="qrText">
+
+        <div id="imgBox">
+            <img src="" id="qrImage">
+        </div>
+
+        <button onclick="generateQR()"> GENERATE QR</button>
+    </div>
+    
+    <a id="downloadLink" download="qr-code.png"> Download QR</a>
+
+<script>
+
+    let imgBox = document.getElementById("imgBox");
+    let qrImage = document.getElementById("qrImage");
+    let qrText = document.getElementById("qrText");
+    let downloadLink = document.getElementById("downloadLink");
+
+    function generateQR() {
+    if (qrText.value.length > 0) {
+        let qrURL = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrText.value);
+        qrImage.src = qrURL;
+        imgBox.classList.add("show-img");
+
+        fetch(qrURL)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = "qr-code.png";
+                downloadLink.style.display = "flex";
+            });
+
+            document.querySelector('.container p').style.display = 'none';
+                document.querySelector('.subtitle').style.display = 'none';
+                document.querySelector('.container').classList.add('qr-generated');
+    } 
+    else {
+        qrText.classList.add('error');
+        setTimeout(() => {
+            qrText.classList.remove('error');
+        }, 1000);
+    }
+}
+qrText.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        generateQR();
+    }
+});
+
+qrText.addEventListener("input", function() {
+            this.classList.remove("error");
+           
+            if (this.value.length === 0) {
+                document.querySelector('.container p').style.display = 'block';
+                document.querySelector('.subtitle').style.display = 'block';
+                document.querySelector('.container').classList.remove('qr-generated');
+                imgBox.classList.remove("show-img");
+                downloadLink.style.display = "none";
+            }
+        });
+    
+</script>
+
+</body>
+</html>
+
+
